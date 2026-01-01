@@ -1,29 +1,32 @@
-﻿using Microsoft.Extensions.Configuration;
-using SqlKata.Execution;
-using SqlKata.Compilers;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using ProductSale.Domain;
-using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Extensions;
+using ProductSale.Lib.App.Models;
+using SqlKata.Compilers;
+using SqlKata.Execution;
 namespace ProductSale.Lib.Infra.Repo
 {
-	public class ProductRepository : IProductRepository
-	{
-		private const string TableName = "ProductInfo";
+    public class ProductRepository : IProductRepository
+    {
+        private const string TableName = "ProductInfo";
         private const string CatTable = "Category";
         private const string SubCatTable = "SubCategory";
 
-        public QueryFactory queryFactory { get;}
-		public ProductRepository(IConfiguration configuration)
-		{
+        public QueryFactory queryFactory { get; }
+        public ProductRepository(IConfiguration configuration)
+        {
 
-			queryFactory = new QueryFactory(
-				connection: new SqlConnection(configuration["EcomProduct"]),
-				compiler: new SqlServerCompiler()
-				);
-		}
+            queryFactory = new QueryFactory(
+                connection: new SqlConnection(configuration["EcomProduct"]),
+                compiler: new SqlServerCompiler()
+                );
+            //var conn = new MySqlConnection(configuration["EcomProduct"]);
+            //queryFactory = new QueryFactory(conn, new MySqlCompiler());
+        }
 
-        public async Task<int> UpsertProductAsync(ProductInfo product) {
+        public async Task<int> UpsertProductAsync(ProductInfo product)
+        {
 
             if (product.Id == 0)
             {
@@ -46,22 +49,23 @@ namespace ProductSale.Lib.Infra.Repo
             return await queryFactory.Query(TableName)
                 .Where("Id", product.Id)
                 .UpdateAsync(new
-            {
-                Name = product.Name,
-                CatId = product.CatId,
-                SubCatId = product.SubCatId,
-                Description = product.Description,
-                Price = product.Price,
-                ImageName = product.ImageName,
-                IsActive = product.IsActive,
-                UpdatedBy = product.UpdatedBy,
-                UpdatedDateTime = product.UpdatedDateTime,
-            });
+                {
+                    Name = product.Name,
+                    CatId = product.CatId,
+                    SubCatId = product.SubCatId,
+                    Description = product.Description,
+                    Price = product.Price,
+                    ImageName = product.ImageName,
+                    IsActive = product.IsActive,
+                    UpdatedBy = product.UpdatedBy,
+                    UpdatedDateTime = product.UpdatedDateTime,
+                });
         }
-        public async Task<ProductInfo> GetByIdAsync(long id) {
+        public async Task<ProductInfo> GetByIdAsync(long id)
+        {
 
             var result = await queryFactory.Query(TableName)
-                 .Where("IsActive",true)
+                 .Where("IsActive", true)
                 .Where("Id", id)
                 .GetAsync<ProductInfo>();
 
@@ -79,7 +83,8 @@ namespace ProductSale.Lib.Infra.Repo
 
             return result ?? string.Empty;
         }
-        public async Task<List<ProductInfoDto>> GetAllProductsAsync() {
+        public async Task<List<ProductInfoDto>> GetAllProductsAsync()
+        {
             try
             {
                 var results = await queryFactory.Query(TableName)
@@ -93,7 +98,7 @@ namespace ProductSale.Lib.Infra.Repo
 
                 return results.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -122,7 +127,7 @@ namespace ProductSale.Lib.Infra.Repo
 
                 return result.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }

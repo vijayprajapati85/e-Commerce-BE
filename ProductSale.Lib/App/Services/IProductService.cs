@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using ProductSale.Domain;
-using ProductSale.Lib.App.Models;
+﻿using ProductSale.Lib.App.Models;
 
 namespace ProductSale.Lib.App.Services
 {

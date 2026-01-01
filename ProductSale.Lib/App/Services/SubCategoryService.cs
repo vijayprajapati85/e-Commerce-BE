@@ -1,5 +1,4 @@
-﻿using ProductSale.Domain;
-using ProductSale.Lib.App.Builder;
+﻿using ProductSale.Lib.App.Builder;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.Domain;
 using ProductSale.Lib.Infra.Repo;
@@ -47,7 +46,7 @@ namespace ProductSale.Lib.App.Services
         {
             try
             {
-               return await _repository.UpsertSubCateogryAsync(new SubCategory
+                return await _repository.UpsertSubCateogryAsync(new SubCategory
                 {
                     Id = subCategory.Id,
                     Name = subCategory.Name,

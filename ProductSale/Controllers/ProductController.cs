@@ -7,7 +7,7 @@ using ProductSale.Lib.Infra.WebApi;
 namespace ProductSale.Controllers
 {
     [EnableCors("CorsPolicy")]
-    [Route("api/v1/[controller]")]
+    [Route("v1/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace ProductSale.Controllers
             _service = service;
             _env = webHostEnvironment;
         }
-        
+
         [HttpPost("InsertUpdate")]
         public async Task<IActionResult> UpsertProduct([FromHeader(Name = "userid")] string userid, [FromForm] ProductInfoRequest productInfo)
         {

@@ -1,5 +1,4 @@
-﻿using ProductSale.Domain;
-using ProductSale.Lib.App.Models;
+﻿using ProductSale.Lib.App.Models;
 using ProductSale.Lib.Domain;
 
 namespace ProductSale.Lib.App.Builder
@@ -25,7 +24,7 @@ namespace ProductSale.Lib.App.Builder
                 Id = category.Id,
                 Name = category.Name,
                 IsActive = category.IsActive,
-                SubCategories = category.SubCategories !=null ? SubCategoryDtoMapping.SetSubCategory(category.SubCategories) : null,
+                SubCategories = category.SubCategories != null ? SubCategoryDtoMapping.SetSubCategory(category.SubCategories) : null,
             };
         }
     }
