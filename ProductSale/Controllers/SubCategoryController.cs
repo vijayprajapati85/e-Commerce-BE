@@ -7,7 +7,7 @@ using ProductSale.Lib.Infra.WebApi;
 namespace ProductSale.Controllers
 {
     [EnableCors("CorsPolicy")]
-    [Route("api/v1/[controller]")]
+    [Route("v1/[controller]")]
     [ApiController]
     public class SubCategoryController : ControllerBase
     {
@@ -60,7 +60,7 @@ namespace ProductSale.Controllers
             var result = await _service.DeleteSubCategoryAsync(id);
             if (result != 0)
             {
-                return Ok(JsonResultVm <long>.SuccessResponse("SubCategory deleted successfully.", id));
+                return Ok(JsonResultVm<long>.SuccessResponse("SubCategory deleted successfully.", id));
             }
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
         }

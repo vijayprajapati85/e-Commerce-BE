@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-
-namespace ProductSale
+﻿namespace ProductSale
 {
     public static class Program
     {
@@ -23,7 +21,8 @@ namespace ProductSale
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(ConfigureConfigurations)
-                .ConfigureWebHostDefaults(webBuilder => {
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseWebRoot("images");
                     //webBuilder.ConfigureLogging(logging =>

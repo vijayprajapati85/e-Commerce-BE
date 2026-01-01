@@ -1,31 +1,34 @@
-﻿using Microsoft.Extensions.Configuration;
-using SqlKata.Execution;
-using SqlKata.Compilers;
-using Microsoft.Data.SqlClient;
-using ProductSale.Domain;
-using ProductSale.Lib.Domain;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using ProductSale.Lib.App.Models;
+using ProductSale.Lib.Domain;
+using SqlKata.Compilers;
+using SqlKata.Execution;
 namespace ProductSale.Lib.Infra.Repo
 {
-	public class SubCategoryRepository : ISubCategoryRepository
+    public class SubCategoryRepository : ISubCategoryRepository
     {
-		private const string TableName = "SubCategory";
+        private const string TableName = "SubCategory";
 
-        public QueryFactory queryFactory { get;}
-		public SubCategoryRepository(IConfiguration configuration)
-		{
+        public QueryFactory queryFactory { get; }
+        public SubCategoryRepository(IConfiguration configuration)
+        {
 
-			queryFactory = new QueryFactory(
-				connection: new SqlConnection(configuration["EcomProduct"]),
-				compiler: new SqlServerCompiler()
-				);
-		}
+            queryFactory = new QueryFactory(
+                connection: new SqlConnection(configuration["EcomProduct"]),
+                compiler: new SqlServerCompiler()
+                );
 
-        public async Task<int> UpsertSubCateogryAsync(SubCategory subCategory) {
+            //var conn = new MySqlConnection(configuration["EcomProduct"]);
+            //queryFactory = new QueryFactory(conn, new MySqlCompiler());
+        }
+
+        public async Task<int> UpsertSubCateogryAsync(SubCategory subCategory)
+        {
 
             if (subCategory.Id == 0)
             {
-                return await queryFactory.StatementAsync("exec InsertSubCategories @Name,@CatId,@UserId", new { Name = subCategory.Name, CatId = subCategory.CatId, UserId = subCategory.CreatedBy });
+                return await queryFactory.StatementAsync("exec InsertSubCategories @p_Name,@p_CatId,@p_UserId", new { p_Name = subCategory.Name, p_CatId = subCategory.CatId, p_UserId = subCategory.CreatedBy });
             }
 
             return await queryFactory.Query(TableName)
@@ -39,19 +42,21 @@ namespace ProductSale.Lib.Infra.Repo
                     UpdatedDateTime = subCategory.UpdatedDateTime,
                 });
         }
-        public async Task<SubCategory> GetByIdAsync(long id) {
+        public async Task<SubCategory> GetByIdAsync(long id)
+        {
 
             var result = await queryFactory.Query(TableName)
-                 .Where("IsActive",true)
+                 .Where("IsActive", true)
                 .Where("Id", id)
                 .GetAsync<SubCategory>();
 
             return result.FirstOrDefault() ?? new SubCategory();
         }
-        public async Task<List<SubCategory>> GetAllSubCategoryAsync() {
+        public async Task<List<SubCategory>> GetAllSubCategoryAsync()
+        {
 
             var results = await queryFactory.Query(TableName)
-                .Where("IsActive",true)
+                .Where("IsActive", true)
                 .GetAsync<SubCategory>();
 
             return results.ToList();

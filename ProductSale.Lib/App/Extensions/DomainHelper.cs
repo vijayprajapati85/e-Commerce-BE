@@ -1,5 +1,4 @@
 ﻿using SqlKata;
-using System.Data;
 
 namespace ProductSale.Lib.App.Extensions
 {

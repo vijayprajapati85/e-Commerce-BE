@@ -5,11 +5,9 @@ namespace ProductSale
 {
     public class Startup
     {
-        private IHostEnvironment Environment { get; }
         private IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
-            Environment = environment;
             Configuration = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .Build();
@@ -26,11 +24,17 @@ namespace ProductSale
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (env.IsDevelopment())
+            //{
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("./swagger/v1/swagger.json", "jiyazon.com V1");
+            //});
+            //}
+            app.UseStaticFiles();
+
             // Serve files from the physical "images" folder at URL path /images
             app.UseDefaultFiles(new DefaultFilesOptions
             {
@@ -46,7 +50,7 @@ namespace ProductSale
 
             app.UseRouting();
             app.UseCors("CorsPolicy");
-            
+
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 
         }

@@ -30,7 +30,8 @@ namespace ProductSale.Lib.App.Extensions
 
         public static async Task<string> UploadFileAsync(this IFormFile file, IFileHelper helper, string basePath)
         {
-            if (file == null) {
+            if (file == null)
+            {
                 return string.Empty;
             }
             try
@@ -51,8 +52,9 @@ namespace ProductSale.Lib.App.Extensions
 
                 return uniqueName;
             }
-            catch (Exception) { 
-            
+            catch (Exception)
+            {
+
                 return string.Empty;
             }
         }

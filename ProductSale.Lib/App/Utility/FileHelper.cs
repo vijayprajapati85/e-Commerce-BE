@@ -5,13 +5,13 @@ namespace ProductSale.Lib.App.Utility
     {
         public string GetFileAsString(string path)
         {
-            return File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(),path));
+            return File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), path));
         }
 
         public byte[] ConvertFileToBytes(IFormFile file)
         {
             MemoryStream memoryStream = new MemoryStream();
-            using(Stream stream = file.OpenReadStream())
+            using (Stream stream = file.OpenReadStream())
             {
                 stream.CopyTo(memoryStream);
             }
@@ -25,7 +25,7 @@ namespace ProductSale.Lib.App.Utility
         }
 
         public string GetUniqueFileName(string fileName)
-        { 
+        {
             return Guid.NewGuid().ToString() + Path.GetExtension(fileName);
         }
     }

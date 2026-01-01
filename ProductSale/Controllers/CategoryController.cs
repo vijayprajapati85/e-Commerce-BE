@@ -7,7 +7,7 @@ using ProductSale.Lib.Infra.WebApi;
 namespace ProductSale.Controllers
 {
     [EnableCors("CorsPolicy")]
-    [Route("api/v1/[controller]")]
+    [Route("v1/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace ProductSale.Controllers
         public async Task<IActionResult> Upsert([FromHeader(Name = "userid")] string userid, [FromBody] CategoryRequest request)
         {
             _service.UserId = userid;
-            var result = request != null ?  await _service.UpsertCateogryAsync(request) : 0;
+            var result = request != null ? await _service.UpsertCateogryAsync(request) : 0;
             if (result != 0)
             {
                 return Ok(JsonResultVm<int>.SuccessResponse("Category saved successfully.", result));
@@ -63,6 +63,12 @@ namespace ProductSale.Controllers
                 return Ok(JsonResultVm<long>.SuccessResponse("Category deleted successfully.", id));
             }
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
+        }
+
+        [HttpGet("Test")]
+        public async Task<IActionResult> TestResult()
+        {
+            return Ok(JsonResultVm<int>.SuccessResponse("Test successfully.", 1));
         }
     }
 }

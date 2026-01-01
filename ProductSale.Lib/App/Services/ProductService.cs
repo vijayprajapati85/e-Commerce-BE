@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using ProductSale.Domain;
 using ProductSale.Lib.App.Builder;
 using ProductSale.Lib.App.Extensions;
@@ -31,7 +30,7 @@ namespace ProductSale.Lib.App.Services
                 {
                     if (!string.IsNullOrEmpty(result.ImageName))
                     {
-                        result.ImageName = folderPath+$"{result.ImageName}";
+                        result.ImageName = folderPath + $"{result.ImageName}";
                     }
                 });
 
