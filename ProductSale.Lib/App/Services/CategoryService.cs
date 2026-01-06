@@ -1,4 +1,5 @@
-﻿using ProductSale.Lib.App.Builder;
+﻿using Microsoft.Extensions.Logging;
+using ProductSale.Lib.App.Builder;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.Domain;
 using ProductSale.Lib.Infra.Repo;
@@ -8,22 +9,25 @@ namespace ProductSale.Lib.App.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _repository;
+        private readonly ILogger<CategoryService> _logger;
         public string? UserId { get; set; }
-        public CategoryService(ICategoryRepository repository)
+        public CategoryService(ICategoryRepository repository, ILogger<CategoryService> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         public async Task<List<CategoryDto>?> GetAllCategoryAsync()
         {
             try
             {
+                _logger.LogInformation("Inside GetAllCategoryAsync ===");
                 List<Category> categories = await _repository.GetAllCategoryAsync();
                 return CategoryDtoMapping.SetCategory(categories);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError("Error: GetAllCategoryAsync => {error}", ex.Message);
                 return null;
             }
         }
@@ -46,6 +50,7 @@ namespace ProductSale.Lib.App.Services
         {
             try
             {
+                _logger.LogInformation("Inside UpsertCateogryAsync ===");
                 return await _repository.UpsertCateogryAsync(new Category
                 {
                     Id = category.Id,
@@ -59,7 +64,7 @@ namespace ProductSale.Lib.App.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError("Error: UpsertCateogryAsync => {error}", ex.Message);
                 return 0;
             }
         }
@@ -74,10 +79,11 @@ namespace ProductSale.Lib.App.Services
                     UpdatedBy = UserId ?? string.Empty,
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return 0;
+                throw;
+                //Console.WriteLine(ex.Message);
+                //return 0;
             }
         }
     }

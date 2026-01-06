@@ -1,5 +1,6 @@
 ﻿using DependencyRegister;
 using Microsoft.Extensions.FileProviders;
+using ProductSale.Lib.App.Models;
 
 namespace ProductSale
 {
@@ -19,6 +20,7 @@ namespace ProductSale
                 options.InvokeHandlersAfterFailure = false;
             });
             services.AddOptions();
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddRegisters(Configuration, typeof(Startup).Assembly);
         }
 

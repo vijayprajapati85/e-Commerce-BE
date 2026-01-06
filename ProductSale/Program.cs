@@ -1,4 +1,6 @@
-﻿namespace ProductSale
+﻿using Serilog;
+
+namespace ProductSale
 {
     public static class Program
     {
@@ -21,6 +23,10 @@
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(ConfigureConfigurations)
+                .UseSerilog((context, services, configuration) => configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
