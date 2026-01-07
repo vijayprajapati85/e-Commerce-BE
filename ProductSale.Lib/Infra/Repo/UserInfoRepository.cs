@@ -83,7 +83,8 @@ namespace ProductSale.Lib.Infra.Repo
                      .Where("id", userInfo.Id)
                          .UpdateAsync(new
                         {
-                            password = userInfo.Password,
+                             emailsend = userInfo.EmailSend,
+                             password = userInfo.Password,
                         });
             }
             catch(Exception)

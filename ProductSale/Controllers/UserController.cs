@@ -26,12 +26,51 @@ namespace ProductSale.Controllers
             try
             {
                 var result = await _service.CreateUser(userInfo);
+                if (result >= 1)
+                {
+                    return Ok(JsonResultVm<int>.SuccessResponse("Email sent.", result));
+                }
 
-                return Ok(JsonResultVm<int>.SuccessResponse("Email sent.", result));
+                return BadRequest(JsonResultVm<int>.FailResponse("something worng during create user.", "Error..", result));
             }
             catch (Exception ex)
             {
                 return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, userInfo.EmailId));
+            }
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string emailId)
+        {
+            try
+            {
+                var result = await _service.ForgotPassword(emailId);
+                if (result >= 1)
+                {
+                    return Ok(JsonResultVm<int>.SuccessResponse("Email sent with reset password.", result));
+                }
+
+                return BadRequest(JsonResultVm<int>.FailResponse("something worng during reset password.", "Error..", result));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, emailId));
+            }
+        }
+
+        [HttpPost("SignIn")]
+        public async Task<IActionResult> SignIn([FromBody] UserSignin userSignin)
+        {
+            try
+            {
+                var userProfile = await _service.UserSigin(userSignin);
+                return Ok(JsonResultVm<UserProfile>.SuccessResponse("Login Success.", userProfile));
+
+            }
+            catch(Exception ex)
+            {
+               return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, userSignin.EmailId));
             }
         }
 

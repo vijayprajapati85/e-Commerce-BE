@@ -8,6 +8,7 @@ namespace ProductSale.ServiceRegisters
     {
         public void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IMailService, MailService>(); 
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ICategoryService, CategoryService>();
