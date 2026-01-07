@@ -1,6 +1,9 @@
 ﻿using DependencyRegister;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using ProductSale.Lib.App.Models;
+using System.Text;
 
 namespace ProductSale
 {
@@ -15,10 +18,26 @@ namespace ProductSale
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthorization(options =>
-            {
-                options.InvokeHandlersAfterFailure = false;
-            });
+            services.AddAuthentication(options =>
+                {
+                    // Set JWT Bearer as the default scheme for authenticating and challenging requests
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
             services.AddOptions();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddRegisters(Configuration, typeof(Startup).Assembly);
