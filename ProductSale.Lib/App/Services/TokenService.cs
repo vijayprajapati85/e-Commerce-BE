@@ -1,14 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ProductSale.Lib.App.Models;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductSale.Lib.App.Services
 {
@@ -19,8 +14,6 @@ namespace ProductSale.Lib.App.Services
         {
             _config = configuration;
         }
-
-
         public string GenerateToken(UserSignin userSignin)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

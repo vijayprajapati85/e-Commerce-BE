@@ -38,6 +38,7 @@ namespace ProductSale
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
+            services.AddMemoryCache();
             services.AddOptions();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddRegisters(Configuration, typeof(Startup).Assembly);

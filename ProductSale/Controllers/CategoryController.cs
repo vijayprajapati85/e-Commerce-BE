@@ -11,11 +11,9 @@ namespace ProductSale.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryService _service;
         public CategoryController(ICategoryService service, ILogger<CategoryController> logger)
         {
-            _logger = logger;
             _service = service;
         }
 

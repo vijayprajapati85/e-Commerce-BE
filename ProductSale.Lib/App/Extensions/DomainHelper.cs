@@ -4,7 +4,7 @@ namespace ProductSale.Lib.App.Extensions
 {
     public static class DomainHelper
     {
-        public static void DynamicallySetWhere<T>(T filterDto, Query query, string tableName = null)
+        public static void DynamicallySetWhere<T>(T filterDto, Query query, string tableName)
         {
             var properties = typeof(T).GetProperties();
             foreach (var prop in properties)
