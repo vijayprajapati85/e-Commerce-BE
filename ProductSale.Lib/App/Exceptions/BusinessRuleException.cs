@@ -2,7 +2,7 @@
 {
     public class BusinessRuleException : Exception
     {
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public BusinessRuleException(string message) : base(message) { }
 
         public BusinessRuleException(string title, string message) : base(message)

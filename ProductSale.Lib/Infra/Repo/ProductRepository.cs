@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ProductSale.Domain;
 using ProductSale.Lib.App.Extensions;
 using ProductSale.Lib.App.Models;
@@ -12,79 +13,103 @@ namespace ProductSale.Lib.Infra.Repo
         private const string TableName = "ProductInfo";
         private const string CatTable = "Category";
         private const string SubCatTable = "SubCategory";
-
+        private readonly ILogger<ProductRepository> _logger;
         public QueryFactory queryFactory { get; }
-        public ProductRepository(IConfiguration configuration)
+        public ProductRepository(IConfiguration configuration, ILogger<ProductRepository> logger)
         {
 
             queryFactory = new QueryFactory(
                 connection: new SqlConnection(configuration["EcomProduct"]),
                 compiler: new SqlServerCompiler()
                 );
-            //var conn = new MySqlConnection(configuration["EcomProduct"]);
-            //queryFactory = new QueryFactory(conn, new MySqlCompiler());
+            _logger = logger;
         }
 
         public async Task<int> UpsertProductAsync(ProductInfo product)
         {
-
-            if (product.Id == 0)
+            _logger.LogInformation("Inside UpsertProductAsync ===");
+            try
             {
-                return await queryFactory.Query(TableName).InsertAsync(new
+                if (product.Id == 0)
                 {
-                    Name = product.Name,
-                    CatId = product.CatId,
-                    SubCatId = product.SubCatId,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageName = product.ImageName,
-                    IsActive = product.IsActive,
-                    CreatedBy = product.CreatedBy,
-                    CreatedDateTime = product.CreatedDateTime,
-                    UpdatedBy = product.UpdatedBy,
-                    UpdatedDateTime = product.UpdatedDateTime,
-                });
-            }
+                    return await queryFactory.Query(TableName).InsertAsync(new
+                    {
+                        Name = product.Name,
+                        CatId = product.CatId,
+                        SubCatId = product.SubCatId,
+                        Description = product.Description,
+                        Price = product.Price,
+                        ImageName = product.ImageName,
+                        IsActive = product.IsActive,
+                        CreatedBy = product.CreatedBy,
+                        CreatedDateTime = product.CreatedDateTime,
+                        UpdatedBy = product.UpdatedBy,
+                        UpdatedDateTime = product.UpdatedDateTime,
+                    });
+                }
 
-            return await queryFactory.Query(TableName)
-                .Where("Id", product.Id)
-                .UpdateAsync(new
-                {
-                    Name = product.Name,
-                    CatId = product.CatId,
-                    SubCatId = product.SubCatId,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageName = product.ImageName,
-                    IsActive = product.IsActive,
-                    UpdatedBy = product.UpdatedBy,
-                    UpdatedDateTime = product.UpdatedDateTime,
-                });
+                return await queryFactory.Query(TableName)
+                    .Where("Id", product.Id)
+                    .UpdateAsync(new
+                    {
+                        Name = product.Name,
+                        CatId = product.CatId,
+                        SubCatId = product.SubCatId,
+                        Description = product.Description,
+                        Price = product.Price,
+                        ImageName = product.ImageName,
+                        IsActive = product.IsActive,
+                        UpdatedBy = product.UpdatedBy,
+                        UpdatedDateTime = product.UpdatedDateTime,
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside UpsertProductAsync === {error}", ex);
+                return 0;
+            }
         }
         public async Task<ProductInfo> GetByIdAsync(long id)
         {
+            _logger.LogInformation("Inside GetByIdAsync ===");
+            try
+            {
+                var result = await queryFactory.Query(TableName)
+                     .Where("IsActive", true)
+                    .Where("Id", id)
+                    .GetAsync<ProductInfo>();
 
-            var result = await queryFactory.Query(TableName)
-                 .Where("IsActive", true)
-                .Where("Id", id)
-                .GetAsync<ProductInfo>();
-
-            return result.FirstOrDefault() ?? new ProductInfo();
+                return result.FirstOrDefault() ?? new ProductInfo();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside GetByIdAsync === {error}", ex);
+                return new ProductInfo();
+            }
         }
 
         public async Task<string> GetImageNameByIdAsync(long id)
         {
+            _logger.LogInformation("Inside GetImageNameByIdAsync ===");
+            try
+            {
+                var result = await queryFactory.Query(TableName)
+                    .Select("ImageName")
+                    .Where("IsActive", true)
+                    .Where("Id", id)
+                    .FirstOrDefaultAsync<string>();
 
-            var result = await queryFactory.Query(TableName)
-                .Select("ImageName")
-                .Where("IsActive", true)
-                .Where("Id", id)
-                .FirstOrDefaultAsync<string>();
-
-            return result ?? string.Empty;
+                return result ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside GetImageNameByIdAsync === {error}", ex);
+                return string.Empty;
+            }
         }
-        public async Task<List<ProductInfoDto>> GetAllProductsAsync()
+        public async Task<List<ProductInfoDto>?> GetAllProductsAsync()
         {
+            _logger.LogInformation("Inside GetAllProductsAsync ===");
             try
             {
                 var results = await queryFactory.Query(TableName)
@@ -100,21 +125,32 @@ namespace ProductSale.Lib.Infra.Repo
             }
             catch (Exception ex)
             {
+                _logger.LogError("Inside GetAllProductsAsync === {error}", ex);
                 return null;
             }
         }
         public async Task<int> DeleteProductAsync(long id)
         {
-            return await queryFactory.Query(TableName)
-                .Where("Id", id)
-                .UpdateAsync(new
-                {
-                    IsActive = false
-                });
+            _logger.LogInformation("Inside DeleteProductAsync ===");
+            try
+            {
+                return await queryFactory.Query(TableName)
+                    .Where("Id", id)
+                    .UpdateAsync(new
+                    {
+                        IsActive = false
+                    });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Inside DeleteProductAsync === {error}", ex);
+                return 0;
+            }
         }
 
-        public async Task<List<ProductInfoDto>> GetProductByCatSubCat(ProductFilterDto product)
+        public async Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product)
         {
+            _logger.LogInformation("Inside GetProductByCatSubCat ===");
             try
             {
                 var query = queryFactory.Query(TableName)
@@ -129,6 +165,7 @@ namespace ProductSale.Lib.Infra.Repo
             }
             catch (Exception ex)
             {
+                _logger.LogError("Inside GetProductByCatSubCat === {error}", ex);
                 return null;
             }
         }

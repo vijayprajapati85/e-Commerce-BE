@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.Domain;
 using SqlKata;
@@ -12,9 +13,10 @@ namespace ProductSale.Lib.Infra.Repo
     {
         private const string TableName = "Category";
         private const string SubCategory = "SubCategory";
+        private readonly ILogger<CategoryRepository> _logger;
 
         public QueryFactory queryFactory { get; }
-        public CategoryRepository(IConfiguration configuration)
+        public CategoryRepository(IConfiguration configuration, ILogger<CategoryRepository> logger)
         {
 
             queryFactory = new QueryFactory(
@@ -22,57 +24,63 @@ namespace ProductSale.Lib.Infra.Repo
                 compiler: new SqlServerCompiler()
                 );
 
-            //var conn = new MySqlConnection(configuration["EcomProduct"]);
-            //queryFactory = new QueryFactory(conn, new MySqlCompiler());
+            _logger = logger;
         }
 
         public async Task<int> UpsertCateogryAsync(Category category)
         {
-
-            if (category.Id == 0)
+            _logger.LogInformation("Inside UpsertCateogryAsync ===");
+            try
             {
-                return await queryFactory.StatementAsync("exec InsertCategories @p_Name,@p_UserId", new { p_Name = category.Name, p_UserId = category.CreatedBy });
-            }
-
-            return await queryFactory.Query(TableName)
-                .Where("Id", category.Id)
-                .UpdateAsync(new
+                if (category.Id == 0)
                 {
-                    Name = category.Name,
-                    IsActive = category.IsActive,
-                    UpdatedBy = category.UpdatedBy,
-                    UpdatedDateTime = category.UpdatedDateTime,
-                });
+                    return await queryFactory.StatementAsync("exec InsertCategories @p_Name,@p_UserId", new { p_Name = category.Name, p_UserId = category.CreatedBy });
+                }
+
+                return await queryFactory.Query(TableName)
+                    .Where("Id", category.Id)
+                    .UpdateAsync(new
+                    {
+                        Name = category.Name,
+                        IsActive = category.IsActive,
+                        UpdatedBy = category.UpdatedBy,
+                        UpdatedDateTime = category.UpdatedDateTime,
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside UpsertCateogryAsync === {error}", ex);
+                return 0;
+            }
         }
         public async Task<Category> GetByIdAsync(long id)
         {
+            _logger.LogInformation("Inside GetByIdAsync ===");
+            try
+            {
+                var result = await queryFactory.Query(TableName)
+                     .Where("IsActive", true)
+                    .Where("Id", id)
+                    .GetAsync<Category>();
 
-            var result = await queryFactory.Query(TableName)
-                 .Where("IsActive", true)
-                .Where("Id", id)
-                .GetAsync<Category>();
-
-            return result.FirstOrDefault() ?? new Category();
+                return result.FirstOrDefault() ?? new Category();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Inside GetByIdAsync === {error}", ex);
+                return new Category();
+            }
         }
         public async Task<List<Category>> GetAllCategoryAsync()
         {
+            _logger.LogInformation("Inside GetAllCategoryAsync ===");
 
             try
             {
-
-                // $"{SubCategory}.CatId", $"{TableName}.Id"
-                var results = queryFactory.Query(TableName)
+                   var results = queryFactory.Query(TableName)
                     .LeftJoin(SubCategory, join => join.On($"{SubCategory}.CatId", $"{TableName}.Id").Where($"{SubCategory}.IsActive", true))
                     .Where($"{TableName}.IsActive", true)
                     .Select($"{TableName}.*", $"{SubCategory}.*");
-
-                //var results = new queryFactory.Query($"{TableName} as c")
-                //   .LeftJoin($"{SubCategory} as s", join => join
-                //       .On("s.CatId", "c.Id")
-                //       .Where("s.IsActive", 1)
-                //   )
-                //   .Where("c.IsActive", 1)
-                //   .Select($"{TableName}.*", $"{SubCategory}.*");
 
                 var compiler = new SqlServerCompiler();
                 SqlResult result = compiler.Compile(results);
@@ -93,11 +101,8 @@ namespace ProductSale.Lib.Infra.Repo
                                 currentCategory.SubCategories = new List<SubCategory>();
                                 postDictionary.Add((int)currentCategory.Id, currentCategory);
                             }
-                            // Guard against null or empty mapped SubCategory (left join with no match)
                             if (subCategory != null)
                             {
-                                // If Dapper created a default SubCategory with Id == 0 for no-match rows,
-                                // skip adding that empty object. Adjust property check if your Id type differs.
                                 if (subCategory.Id != 0)
                                 {
                                     currentCategory.SubCategories!.Add(subCategory);
@@ -115,21 +120,29 @@ namespace ProductSale.Lib.Infra.Repo
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError("Inside GetAllCategoryAsync === {error}", ex);
+                return new List<Category>();
             }
-
-            return null;
         }
         public async Task<int> DeleteCategoryAsync(DeleteRequest deleteRequest)
         {
-            return await queryFactory.Query(TableName)
-                .Where("Id", deleteRequest.Id)
-                .UpdateAsync(new
-                {
-                    IsActive = false,
-                    Updatedby = deleteRequest.UpdatedBy,
-                    UpdatedDateTime = DateTime.Now,
-                });
+            _logger.LogInformation("Inside DeleteCategoryAsync ===");
+            try
+            {
+                return await queryFactory.Query(TableName)
+                    .Where("Id", deleteRequest.Id)
+                    .UpdateAsync(new
+                    {
+                        IsActive = false,
+                        Updatedby = deleteRequest.UpdatedBy,
+                        UpdatedDateTime = DateTime.Now,
+                    });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Inside DeleteCategoryAsync === {error}", ex);
+                return 0;
+            }
         }
     }
 }
