@@ -81,7 +81,7 @@ namespace ProductSale.Lib.App.Services
             }
         }
 
-        public async Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product, string folderPath)
+        public async Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product, string folderPath, bool isPriceRequired)
         {
             try
             {
@@ -89,7 +89,12 @@ namespace ProductSale.Lib.App.Services
 
                 if (_cache.TryGetValue(CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId), out List<ProductInfoDto>? productInfoDtos))
                 {
-                    return productInfoDtos;
+                    var priceProduct = productInfoDtos.DeepCopyData();
+                    if (!isPriceRequired)
+                    {
+                        priceProduct?.ForEach(item => { item.Price = 0; });
+                    }
+                    return priceProduct;
                 }
 
                 var result = await _repository.GetProductByCatSubCat(product);
@@ -104,9 +109,15 @@ namespace ProductSale.Lib.App.Services
                         }
                     });
                 }
-
                 _cache.Set(CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId), result);
-                return result;
+
+                var priceData = result.DeepCopyData();
+                if (!isPriceRequired)
+                {
+                    priceData?.ForEach(item => { item.Price = 0; });
+                }
+
+                return priceData;
             }
             catch (Exception ex)
             {

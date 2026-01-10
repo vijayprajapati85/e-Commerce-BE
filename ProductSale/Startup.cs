@@ -38,6 +38,7 @@ namespace ProductSale
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
+            services.AddAuthorization();
             services.AddMemoryCache();
             services.AddOptions();
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
@@ -72,6 +73,8 @@ namespace ProductSale
 
             app.UseRouting();
             app.UseCors("CorsPolicy");
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 

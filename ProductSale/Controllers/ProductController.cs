@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Services;
@@ -72,6 +73,20 @@ namespace ProductSale.Controllers
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
             var result = await _service.GetProductByCatSubCat(product, baseUrl);
+            if (result == null || result.Count == 0)
+            {
+                return Ok(JsonResultVm<ProductInfoDto>.FailResponse("No Records", "Record not found", null));
+            }
+
+            return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
+        }
+
+        [HttpPost("GetProductsWithPrice")]
+        [Authorize]
+        public async Task<IActionResult> GetProductsWithPrice([FromBody] ProductFilterDto product)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+            var result = await _service.GetProductByCatSubCat(product, baseUrl, true);
             if (result == null || result.Count == 0)
             {
                 return Ok(JsonResultVm<ProductInfoDto>.FailResponse("No Records", "Record not found", null));
