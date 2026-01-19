@@ -4,7 +4,20 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="EmailTemplate\ResetPassword.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <None Include="EmailTemplate\ResetPassword.cshtml" />
+
+    <None Include="EmailTemplate\Signup.cshtml" />
+    <None Include="EmailTemplate\_EmaliLayout.cshtml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
