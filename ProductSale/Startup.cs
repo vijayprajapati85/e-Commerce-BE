@@ -4,6 +4,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using ProductSale.Lib.App.Models;
 using System.Text;
+using FluentEmail.MailKitSmtp;
 
 namespace ProductSale
 {
@@ -41,6 +42,17 @@ namespace ProductSale
             services.AddAuthorization();
             services.AddMemoryCache();
             services.AddOptions();
+
+            var smtpOption = Configuration.GetSection(nameof(SmtpClientOptions)).Get<SmtpClientOptions>();
+            smtpOption!.SocketOptions = MailKit.Security.SecureSocketOptions.StartTls;
+
+            services.AddFluentEmail(
+                defaultFromEmail: Configuration["MailSettings:Mail"],
+                defaultFromName: Configuration["MailSettings:DisplayName"]
+           )
+                .AddRazorRenderer()
+                .AddMailKitSender(smtpOption);
+
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddRegisters(Configuration, typeof(Startup).Assembly);
         }

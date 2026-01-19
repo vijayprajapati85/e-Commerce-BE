@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
+using ProductSale.Lib.App.Models.Email;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
 
@@ -81,11 +83,24 @@ namespace ProductSale.Controllers
             {
                 _logger.LogInformation("Attempting to Test Email with emailId: {EmailId}", emailId);
 
-                await _emailService.SendEmailAsync(emailId, "Welcome !!!!", $"This is your test email.<br/><br/> Thanks");
+                // await _emailService.SendEmailAsync(emailId, "Welcome !!!!", $"This is your test email.<br/><br/> Thanks");
 
-                _logger.LogInformation("Test email Sent successfully");
+                EmailCommand emailCommand = new EmailCommand
+                {
+                    EmailType = RecipientType.SignUp,
+                    EmailData = new Dictionary<string, string>
+                    {
+                        {"RecipientName", "Vijay Prajapati" },
+                        {"RecipientEmail", emailId },
+                        {"Password", "abc123" }
+                    }
+                };
 
-                return Ok(JsonResultVm<int>.SuccessResponse("Email sent.", 1));
+                var isEmailSend = await _emailService.SendEmailAsync(emailCommand);
+
+                _logger.LogInformation("Test email Sent successfully {isEmailSend}", isEmailSend);
+
+                return Ok(JsonResultVm<bool>.SuccessResponse("Email sent.", isEmailSend));
             }
             catch (Exception ex)
             {

@@ -1,6 +1,8 @@
-﻿using ProductSale.Lib.App.Exceptions;
+﻿using ProductSale.Lib.App.Constants;
+using ProductSale.Lib.App.Exceptions;
 using ProductSale.Lib.App.Extensions;
 using ProductSale.Lib.App.Models;
+using ProductSale.Lib.App.Models.Email;
 using ProductSale.Lib.Infra.Repo;
 using System.Text.RegularExpressions;
 
@@ -37,7 +39,18 @@ namespace ProductSale.Lib.App.Services
 
                 string password = PasswordGeneratHelper.GeneratePassword();
 
-                var isEmailSend = await _emailService.SendEmailAsync(emailId, "Generate new password", $"Your password is <b>{password}</b>. you may login with this credential and email.<br/><br/> Thanks");
+                EmailCommand emailCommand = new EmailCommand
+                {
+                    EmailType = RecipientType.ForgotPassword,
+                    EmailData = new Dictionary<string, string>
+                    {
+                        { "RecipientName", user.FullName },
+                        { "RecipientEmail", emailId },
+                        { "Password", password },
+                    }
+                };
+
+                var isEmailSend = await _emailService.SendEmailAsync(emailCommand);
 
                 return await _repository.UpdatePassword(new UserInfo
                 {
@@ -71,7 +84,18 @@ namespace ProductSale.Lib.App.Services
 
                 string password = PasswordGeneratHelper.GeneratePassword();
 
-                var isEmailSend =  await _emailService.SendEmailAsync(userInfo.EmailId, "Welcome !!!!", $"Your password is <b>{password}</b>. you may login with this credential and email.<br/><br/> Thanks");
+                EmailCommand emailCommand = new EmailCommand
+                {
+                    EmailType = RecipientType.SignUp,
+                    EmailData = new Dictionary<string, string>
+                    {
+                        { "RecipientName", userInfo.FullName },
+                        { "RecipientEmail", userInfo.EmailId },
+                        { "Password", password },
+                    }
+                };
+
+                var isEmailSend =  await _emailService.SendEmailAsync(emailCommand);
 
                 return await _repository.CreateUser(new UserInfo
                 {
