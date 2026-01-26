@@ -66,7 +66,8 @@ namespace ProductSale.Controllers
         {
             try
             {
-                var userProfile = await _service.UserSigin(userSignin);
+                var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+                var userProfile = await _service.UserSigin(userSignin, baseUrl);
                 return Ok(JsonResultVm<UserProfile>.SuccessResponse("Login Success.", userProfile));
 
             }

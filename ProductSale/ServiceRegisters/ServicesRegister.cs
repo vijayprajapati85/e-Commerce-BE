@@ -13,12 +13,15 @@ namespace ProductSale.ServiceRegisters
             services.AddTransient<IEmailMessageBuilderFactory, EmailMessageBuilderFactory>();
             services.AddKeyedTransient<IEmailMessageBuilder, SignUpEmailMessageBuilder>(RecipientType.SignUp);
             services.AddKeyedTransient<IEmailMessageBuilder, ResetEmailMessageBuilder>(RecipientType.ForgotPassword);
+            services.AddKeyedTransient<IEmailMessageBuilder, OrderEmailMessageBuilder>(RecipientType.Order);
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IMailService, MailService>();
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<ISubCategoryService, SubCategoryService>();
             services.AddTransient<IUserInfoService, UserInfoService>();
+            services.AddTransient<ICartInfoService, CartInfoService>();
+            services.AddTransient<IContactInfoService, ContactInfoService>();
         }
     }
 }
