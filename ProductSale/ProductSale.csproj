@@ -8,12 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="EmailTemplate\Order.cshtml" />
     <Content Remove="EmailTemplate\ResetPassword.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
 
     <None Include="EmailTemplate\ResetPassword.cshtml" />
+
+    <None Include="EmailTemplate\Order.cshtml" />
 
     <None Include="EmailTemplate\Signup.cshtml" />
     <None Include="EmailTemplate\_EmaliLayout.cshtml" />

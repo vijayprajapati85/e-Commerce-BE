@@ -13,6 +13,8 @@ namespace ProductSale.ServiceRegisters
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
             services.AddScoped<IUserInfoRepository, UserInfoRepository>(); 
             services.AddScoped<IFileHelper, FileHelper>();
+            services.AddScoped<ICartInfoRepository, CartInfoRepository>();
+            services.AddScoped<IContactInfoRepository, ContactInfoRepository>();
         }
     }
 }
