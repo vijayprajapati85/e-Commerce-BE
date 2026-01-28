@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
@@ -16,7 +18,7 @@ namespace ProductSale.Controllers
         {
             _service = service;
         }
-
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpPost("InsertUpdate")]
         public async Task<IActionResult> Upsert([FromHeader(Name = "userid")] string userid, [FromBody] CategoryRequest request)
         {
@@ -29,6 +31,7 @@ namespace ProductSale.Controllers
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("Get")]
         public async Task<IActionResult> GetCategory([FromQuery] long id)
         {
@@ -51,6 +54,7 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<List<CategoryDto>>.SuccessResponse("Record found", result, result.Count));
         }
 
+        [Authorize(Roles = Role.Admin)]
         [HttpDelete("Delete")]
         public async Task<IActionResult> DeleteCategory([FromQuery] long id, [FromHeader(Name = "userid")] string userid)
         {

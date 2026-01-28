@@ -14,13 +14,15 @@ namespace ProductSale.Lib.App.Services
         {
             _config = configuration;
         }
-        public string GenerateToken(UserSignin userSignin)
+        public string GenerateToken(UserInfo userSignin)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[] {
-                new Claim(ClaimTypes.Email, userSignin.EmailId)
+                new Claim(ClaimTypes.Email, userSignin.EmailId),
+                new Claim(ClaimTypes.Sid, userSignin.Id.ToString()),
+                new Claim(ClaimTypes.Role, userSignin.Role)
             };
 
             var token = new JwtSecurityToken(

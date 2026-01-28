@@ -2,9 +2,11 @@
 using ProductSale.Lib.App.Exceptions;
 using ProductSale.Lib.App.Extensions;
 using ProductSale.Lib.App.Models;
+using ProductSale.Lib.App.Models.Cart;
 using ProductSale.Lib.App.Models.Email;
 using ProductSale.Lib.Infra.Repo;
 using System.Text.RegularExpressions;
+using static Humanizer.In;
 
 namespace ProductSale.Lib.App.Services
 {
@@ -13,18 +15,20 @@ namespace ProductSale.Lib.App.Services
         private readonly IUserInfoRepository _repository;
         private readonly IMailService _emailService;
         private readonly ITokenService _tokenService;
-        public UserInfoService(IUserInfoRepository repository, IMailService emailService, ITokenService tokenService)
+        private readonly ICartInfoService _cartInfoService;
+        public UserInfoService(IUserInfoRepository repository, IMailService emailService, ITokenService tokenService, ICartInfoService cartInfoService)
         {
             _repository = repository;
             _emailService = emailService;
             _tokenService = tokenService;
+            _cartInfoService = cartInfoService;
         }
 
         public async Task<int> ForgotPassword(string emailId)
         {
             try
             {
-                bool validEmail = checkValidEmailId(emailId);
+                bool validEmail = emailId.ValidEmail();
                 if (!validEmail)
                 {
                     throw new BusinessRuleException("Email address is not valid.");
@@ -69,7 +73,7 @@ namespace ProductSale.Lib.App.Services
         {
             try
             {
-                bool validEmail = checkValidEmailId(userInfo.EmailId);
+                bool validEmail = userInfo.EmailId.ValidEmail();
                 if (!validEmail)
                 {
                     throw new BusinessRuleException("Email address is not valid.");
@@ -126,12 +130,11 @@ namespace ProductSale.Lib.App.Services
             throw new NotImplementedException();
         }
 
-        public async Task<UserProfile> UserSigin(UserSignin userSignin)
+        public async Task<UserProfile> UserSigin(UserSignin userSignin, string folderPath)
         {
             try
             {
-                string token = string.Empty;
-                bool validEmail = checkValidEmailId(userSignin.EmailId);
+                bool validEmail = userSignin.EmailId.ValidEmail();
                 if (!validEmail)
                 {
                     throw new BusinessRuleException("Email address is not valid.");
@@ -141,13 +144,26 @@ namespace ProductSale.Lib.App.Services
 
                 if (user != null && string.Equals(userSignin.Password,user.Password))
                 {
-                    token = _tokenService.GenerateToken(userSignin);
+                   string token = _tokenService.GenerateToken(user);
 
+                    _cartInfoService.UserId = user.Id;
+                    List<Order>? orders = await _cartInfoService.GetPendingCartAsync();
+                    if (orders != null)
+                    {
+                        orders.ForEach(result =>
+                        {
+                            if (!string.IsNullOrEmpty(result.ImageName))
+                            {
+                                result.ImageName = folderPath + $"{result.ImageName}";
+                            }
+                        });
+                    }
                     return new UserProfile
                     {
                         FullName = user.FullName,
                         EmailId = user.EmailId,
                         Token = token,
+                        OrderData = orders
                     };
                 }
              
@@ -159,16 +175,28 @@ namespace ProductSale.Lib.App.Services
             }
         }
 
-        private bool checkValidEmailId(string email)
+        public async Task<UserProfile> AdminSignin(UserSignin userSignin)
         {
-            try
+            try 
             {
-                string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-                return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase);
+                var user = await _repository.GetUserByEmail(userSignin.EmailId);
+                if (user != null && string.Equals(userSignin.Password, user.Password))
+                {
+                  string token = _tokenService.GenerateToken(user);
+
+                    return new UserProfile
+                    {
+                        FullName = user.FullName,
+                        EmailId = user.EmailId,
+                        Token = token,
+                        OrderData = null
+                    };
+                }
+                throw new BusinessRuleException("Login Credential not match");
             }
-            catch
+            catch (Exception)
             {
-                return false;
+                throw;
             }
         }
     }

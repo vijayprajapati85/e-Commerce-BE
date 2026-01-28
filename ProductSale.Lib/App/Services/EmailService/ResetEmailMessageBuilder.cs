@@ -13,7 +13,7 @@ namespace ProductSale.Lib.App.Services.EmailService
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<EmailMessage>> BuildAsync(EmailCommand command)
+        public Task<IEnumerable<EmailMessage>> BuildAsync(EmailCommand command)
         {
             ICollection<EmailAddress> reciepients = new HashSet<EmailAddress>();
 
@@ -23,13 +23,13 @@ namespace ProductSale.Lib.App.Services.EmailService
                 Address = command.EmailData.GetValueOrDefault("RecipientEmail") ?? string.Empty
             });
 
-            var email = BuildEmail(command, RecipientType.UserEmail, reciepients);
+            var email = BuildEmail(command, RecipientType.UserEmail, reciepients ?? []);
             var list = new List<EmailMessage>();
             if (email != null)
             {
                 list.Add(email);
             }
-            return list;
+            return Task.FromResult<IEnumerable<EmailMessage>>(list);
         }
 
         private EmailMessage? BuildEmail(EmailCommand command, string templateName, ICollection<EmailAddress> recipients)

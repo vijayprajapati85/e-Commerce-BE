@@ -77,6 +77,21 @@ namespace ProductSale.Controllers
             }
         }
 
+        [HttpPost("Sign")]
+        public async Task<IActionResult> SignAdmin([FromBody] UserSignin userSignin)
+        {
+            try
+            {
+                var userProfile = await _service.AdminSignin(userSignin);
+                return Ok(JsonResultVm<UserProfile>.SuccessResponse("Login Success.", userProfile));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, userSignin.EmailId));
+            }
+        }
+
         [HttpPost("TestEmail")]
         public async Task<IActionResult> TestEmail([FromBody] string emailId)
         {
