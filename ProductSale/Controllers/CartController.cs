@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models.Cart;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
@@ -12,7 +13,7 @@ namespace ProductSale.Controllers
 {
     [EnableCors("CorsPolicy")]
     [Route("v1/[controller]")]
-    [Authorize]
+    [Authorize(Roles = Role.User)]
     [ApiController]
     public class CartController : ControllerBase
     {

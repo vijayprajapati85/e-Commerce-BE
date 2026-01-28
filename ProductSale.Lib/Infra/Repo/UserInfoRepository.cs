@@ -1,5 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using FluentEmail.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -29,6 +31,7 @@ namespace ProductSale.Lib.Infra.Repo
                         emailId = userInfo.EmailId,
                         password = userInfo.Password,
                         emailsend = userInfo.EmailSend,
+                        role = Role.User,
                         createddatetime = DateTime.Now,
                         updateddatetime = DateTime.Now
                     });
@@ -90,6 +93,24 @@ namespace ProductSale.Lib.Infra.Repo
             catch(Exception)
             {
                 return 0;
+            }
+        }
+
+        public async Task<UserInfo?> GetUserById(long id)
+        {
+            try
+            {
+
+                var result = await queryFactory.Query(TableName)
+                    .Where("Id", id)
+                    .GetAsync<UserInfo>();
+
+                return result?.FirstOrDefault();
+
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

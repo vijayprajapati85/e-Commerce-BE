@@ -8,7 +8,8 @@ namespace ProductSale.Lib.App.Services
         Task<UserInfo?> GetUserByEmail(string emailId);
         Task<int> UpdateEmailSendStatus(UserInfoDto userInfoDto);
         Task<int> UpdatePassword(UserInfoDto userInfoDto);
-        Task<UserProfile> UserSigin(UserSignin userSignin);
+        Task<UserProfile> UserSigin(UserSignin userSignin, string folderPath);
+        Task<UserProfile> AdminSignin(UserSignin userSignin);
         Task<int> ForgotPassword(string emailId);
     }
 }

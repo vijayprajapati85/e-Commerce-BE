@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
@@ -19,6 +21,7 @@ namespace ProductSale.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpPost("InsertUpdate")]
         public async Task<IActionResult> Upsert([FromHeader(Name = "userid")] string userid, [FromBody] SubCategoryRequest request)
         {
@@ -31,6 +34,7 @@ namespace ProductSale.Controllers
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("Get")]
         public async Task<IActionResult> GetSubCategory([FromQuery] long id)
         {
@@ -42,6 +46,7 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<SubCategoryDto>.SuccessResponse("Record found", result));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllCategory()
         {
@@ -53,6 +58,7 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<List<SubCategoryDto>>.SuccessResponse("Record found", result, result.Count));
         }
 
+        [Authorize(Roles = Role.Admin)]
         [HttpDelete("Delete")]
         public async Task<IActionResult> DeleteSubCategory([FromQuery] long id, [FromHeader(Name = "userid")] string userid)
         {
@@ -65,6 +71,7 @@ namespace ProductSale.Controllers
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("GetByCatId")]
         public async Task<IActionResult> GetByCatId([FromQuery] long id)
         {

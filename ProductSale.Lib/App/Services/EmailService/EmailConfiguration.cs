@@ -18,5 +18,20 @@ namespace ProductSale.Lib.App.Services.EmailService
 
             return templates;
         }
+
+        public ICollection<EmailAddress> Recipients(string name)
+        {
+            var recipients = NamedRecipients().Get(name);
+
+            return recipients;
+        }
+
+        private NamedEmailAddresses NamedRecipients()
+        {
+            NamedEmailAddresses addresses = [];
+            configuration.GetSection($"Email:Recipients").Bind(addresses);
+
+            return addresses;
+        }
     }
 }

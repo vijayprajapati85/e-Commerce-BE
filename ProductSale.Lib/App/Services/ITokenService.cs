@@ -4,6 +4,6 @@ namespace ProductSale.Lib.App.Services
 {
     public interface ITokenService
     {
-        string GenerateToken(UserSignin userSignin);
+        string GenerateToken(UserInfo userSignin);
     }
 }

@@ -5,5 +5,6 @@ namespace ProductSale.Lib.App.Services.EmailService
     public interface IEmailConfiguration
     {
         public EmailTemplate Template(EmailCommand command, string name);
+        public ICollection<EmailAddress> Recipients(string name);
     }
 }

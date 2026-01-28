@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
@@ -22,6 +23,7 @@ namespace ProductSale.Controllers
             _env = webHostEnvironment;
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpPost("InsertUpdate")]
         public async Task<IActionResult> UpsertProduct([FromHeader(Name = "userid")] string userid, [FromForm] ProductInfoRequest productInfo)
         {
@@ -34,6 +36,7 @@ namespace ProductSale.Controllers
             return BadRequest(JsonResultVm<int>.FailResponse("Error", "Something went wrong."));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("Get")]
         public async Task<IActionResult> GetProduct([FromQuery] int id)
         {
@@ -45,6 +48,7 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<ProductInfoDto>.SuccessResponse("Record found", result));
         }
 
+        [Authorize(Roles = Role.Admin + "," + Role.DataEntry)]
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetProducts()
         {
@@ -57,6 +61,7 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
         }
 
+        [Authorize(Roles = Role.Admin)]
         [HttpDelete("Delete")]
         public async Task<IActionResult> DeleteProduct([FromQuery] int id)
         {
@@ -81,8 +86,8 @@ namespace ProductSale.Controllers
             return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
         }
 
+        [Authorize(Roles = Role.User)]
         [HttpPost("GetProductsWithPrice")]
-        [Authorize]
         public async Task<IActionResult> GetProductsWithPrice([FromBody] ProductFilterDto product)
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
