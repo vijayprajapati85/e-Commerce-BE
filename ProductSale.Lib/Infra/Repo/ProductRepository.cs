@@ -157,7 +157,17 @@ namespace ProductSale.Lib.Infra.Repo
                             .Join(CatTable, $"{CatTable}.Id", $"{TableName}.CatId")
                     .Join(SubCatTable, $"{SubCatTable}.Id", $"{TableName}.SubCatId");
 
-                DomainHelper.DynamicallySetWhere(product, query, TableName);
+                if (!string.IsNullOrEmpty(product.Name))
+                {
+                    query = query.WhereLike($"{CatTable}.Name", $"%{product.Name.Substring(0, 4)}%");
+                }
+                else
+                {
+                    DomainHelper.DynamicallySetWhere(product, query, TableName);
+                }
+
+                query = query.Where($"{TableName}.IsActive", true);
+
                 var result = await query.Select($"{TableName}.*", $"{CatTable}.Name as CatName", $"{SubCatTable}.Name as SubCatName")
                         .GetAsync<ProductInfoDto>();
 

@@ -163,11 +163,66 @@ namespace ProductSale.Lib.App.Services
                     return null;
                 }
 
-                return await _repository.GetPendingCartAsync(UserId);
+                return await _repository.GetCartByStatusAsync(UserId, CartStatus.Pending);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error in GetPendingCartAsync: {Message}", ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<List<OrderData>?> GetCartByStatusAsync(string status, string folderPath)
+        {
+            _logger.LogInformation("Inside GetCartByStatusAsync ===");
+
+            List<OrderData> orderData = new List<OrderData>();
+            try
+            {
+                if (UserId == 0)
+                {
+                    _logger.LogWarning("Invalid userId provided: {UserId}", UserId);
+                    return null;
+                }
+                var orders = await _repository.GetCartByStatusAsync(UserId, status);
+                if (orders != null)
+                {
+                    orders.ForEach(result =>
+                    {
+                        if (!string.IsNullOrEmpty(result.ImageName))
+                        {
+                            result.ImageName = folderPath + $"{result.ImageName}";
+                        }
+                    });
+                    var distinctData = orders.Select(o => new { o.OrderId, o.OrderDate }).Distinct().ToList();
+                    if(distinctData == null || distinctData.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    orderData = orders.GroupBy(o => new { o.OrderId, o.OrderDate })
+                     .Select(g => new OrderData
+                     {
+                         OrderId = g.Key.OrderId,
+                         OrderDate = g.Key.OrderDate,
+                         Orders = g.Select(o => new Order
+                         {
+                             // Assuming 'Order' class properties match your SQL query output
+                             ProductId = o.ProductId,
+                             ImageName = o.ImageName,
+                             Name = o.Name,
+                             Price = o.Price,
+                             Quantity = o.Quantity
+                         }).ToList()
+                     }).ToList();
+
+                    return orderData;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in GetCartByStatusAsync: {Message}", ex.Message);
                 return null;
             }
         }

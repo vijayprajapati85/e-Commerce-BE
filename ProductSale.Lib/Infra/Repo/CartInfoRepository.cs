@@ -177,7 +177,7 @@ namespace ProductSale.Lib.Infra.Repo
             }
         }
 
-        public async Task<List<Order>?> GetPendingCartAsync(long userId)
+        public async Task<List<Order>?> GetCartByStatusAsync(long userId, string status)
         {
             _logger.LogInformation("Inside GetPendingCartAsync ===");
             try
@@ -190,8 +190,21 @@ namespace ProductSale.Lib.Infra.Repo
                 return (List<Order>)await queryFactory.Query(ProductInfo)
                     .LeftJoin(TableName, "CartInfo.ProductId", "ProductInfo.Id")
                     .Where("CartInfo.UserId", userId)
-                    .Where("CartInfo.Status", CartStatus.Pending)
-                    .Select("ProductInfo.Id as ProductId", "ProductInfo.ImageName as ImageName", "ProductInfo.Name as Name", "ProductInfo.Price as Price", "CartInfo.Quantity as Quantity", "CartInfo.OrderId as OrderId")
+                    .Where("CartInfo.Status", status)
+                    .Select("ProductInfo.Id as ProductId", 
+                            "ProductInfo.ImageName as ImageName", 
+                            "ProductInfo.Name as Name", 
+                            "ProductInfo.Price as Price", 
+                            "CartInfo.Quantity as Quantity", 
+                            "CartInfo.OrderId as OrderId")
+                    .SelectRaw(
+                            "CAST(" +
+                            "CASE " +
+                            "WHEN CartInfo.CreatedDateTime > CartInfo.UpdatedDateTime THEN CartInfo.CreatedDateTime " +
+                            "ELSE CartInfo.UpdatedDateTime " +
+                            "END AS DATE" +
+                            ") AS OrderDate"
+                    )
                     .GetAsync<Order>();
 
             }
