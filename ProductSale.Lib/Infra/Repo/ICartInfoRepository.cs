@@ -6,7 +6,7 @@ namespace ProductSale.Lib.Infra.Repo
     {
         Task<int> UpsertCartInfoAsync(CartInfo cartInfo);
         Task<List<CartInfo>?> GetCartByUserIdAsync(long userId);
-        Task<List<Order>?> GetPendingCartAsync(long userId);
+        Task<List<Order>?> GetCartByStatusAsync(long userId, string status);
         Task<int> DeleteCartInfoAsync(CartInfo cartInfo);
         Task<(int, long)> CartOrderAsync(long userId);
         Task<List<Order>?> GetOrderByUserIdAsync(long userId, string orderId = "");

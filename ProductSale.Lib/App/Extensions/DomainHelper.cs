@@ -14,7 +14,7 @@ namespace ProductSale.Lib.App.Extensions
                 {
                     if (prop.PropertyType == typeof(string))
                     {
-                        query.WhereRaw(string.Format("LOWER({0}) = LOWER(?)", prop.Name.ToLower()), prop.GetValue(filterDto));
+                        //query.WhereRaw(string.Format("LOWER({0}) = LOWER(?)", prop.Name.ToLower()), prop.GetValue(filterDto));
                     }
                     else
                     {

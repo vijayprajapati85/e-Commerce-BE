@@ -87,9 +87,14 @@ namespace ProductSale.Lib.App.Services
             {
                 _logger.LogInformation("Inside GetProductByCatSubCat ===");
 
-                if (_cache.TryGetValue(CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId), out List<ProductInfoDto>? productInfoDtos))
+                // Determine which cache key to use based on presence of CatName
+                var cacheKey = string.IsNullOrEmpty(product.Name)
+                    ? CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId)
+                    : CacheKey.ProductByCatNameKey(product.Name);
+
+                if (_cache.TryGetValue(cacheKey, out List<ProductInfoDto>? cachedProducts))
                 {
-                    var priceProduct = productInfoDtos.DeepCopyData();
+                    var priceProduct = cachedProducts.DeepCopyData();
                     if (!isPriceRequired)
                     {
                         priceProduct?.ForEach(item => { item.Price = 0; });
@@ -109,15 +114,23 @@ namespace ProductSale.Lib.App.Services
                         }
                     });
                 }
-                _cache.Set(CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId), result);
+
+                if (string.IsNullOrEmpty(product.Name))
+                {
+                    _cache.Set(CacheKey.ProductByCatSubCatKey(product.CatId, product.SubCatId), result);
+                }
+                else
+                {
+                    _cache.Set(CacheKey.ProductByCatNameKey(product.Name), result);
+                }
 
                 var priceData = result.DeepCopyData();
                 if (!isPriceRequired)
                 {
                     priceData?.ForEach(item => { item.Price = 0; });
                 }
-
                 return priceData;
+
             }
             catch (Exception ex)
             {

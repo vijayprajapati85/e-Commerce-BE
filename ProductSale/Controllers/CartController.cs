@@ -102,5 +102,31 @@ namespace ProductSale.Controllers
             }
             return BadRequest(JsonResultVm<List<Order>>.FailResponse("Error", "Something went wrong."));
         }
+
+        [HttpPost("TrackOrder")]
+        public async Task<IActionResult> TrackOrder()
+        {
+            string authorizationHeader = Request.Headers[HeaderNames.Authorization].ToString();
+            var handler = new JwtSecurityTokenHandler();
+            if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+            {
+                string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                var jsonToken = handler.ReadJwtToken(token);
+                var userIdClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid);
+                _service.UserId = Convert.ToInt64(userIdClaim?.Value);
+            }
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+
+            TrackOrder trackOrder = new TrackOrder();
+            var inProgress = await _service.GetCartByStatusAsync(CartStatus.InProgress, baseUrl);
+            trackOrder.InProgress = inProgress ?? new List<OrderData>();
+
+            var completed = await _service.GetCartByStatusAsync(CartStatus.Completed, baseUrl);
+
+            trackOrder.Completed = completed ?? new List<OrderData>();
+
+            return Ok(JsonResultVm<TrackOrder>.SuccessResponse("Cart fetched successfully.", trackOrder));
+        }
     }
 }
