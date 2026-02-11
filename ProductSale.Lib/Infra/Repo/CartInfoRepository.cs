@@ -187,15 +187,15 @@ namespace ProductSale.Lib.Infra.Repo
                     _logger.LogInformation("Invalid userId provided: {UserId}", userId);
                     return null;
                 }
-                return (List<Order>)await queryFactory.Query(ProductInfo)
+                var query = queryFactory.Query(ProductInfo)
                     .LeftJoin(TableName, "CartInfo.ProductId", "ProductInfo.Id")
-                    .Where("CartInfo.UserId", userId)
+                    // .Where("CartInfo.UserId", userId != -1 ? userId : "CartInfo.UserId")
                     .Where("CartInfo.Status", status)
-                    .Select("ProductInfo.Id as ProductId", 
-                            "ProductInfo.ImageName as ImageName", 
-                            "ProductInfo.Name as Name", 
-                            "ProductInfo.Price as Price", 
-                            "CartInfo.Quantity as Quantity", 
+                    .Select("ProductInfo.Id as ProductId",
+                            "ProductInfo.ImageName as ImageName",
+                            "ProductInfo.Name as Name",
+                            "ProductInfo.Price as Price",
+                            "CartInfo.Quantity as Quantity",
                             "CartInfo.OrderId as OrderId")
                     .SelectRaw(
                             "CAST(" +
@@ -204,8 +204,17 @@ namespace ProductSale.Lib.Infra.Repo
                             "ELSE CartInfo.UpdatedDateTime " +
                             "END AS DATE" +
                             ") AS OrderDate"
-                    )
-                    .GetAsync<Order>();
+                    );
+                // .GetAsync<Order>();
+
+                query = query.When(userId != -1, q =>
+                {
+                    return q.Where("CartInfo.UserId", userId);
+                });
+
+                var orders = (List<Order>)await query.GetAsync<Order>();
+
+                return orders;
 
             }
             catch (Exception ex)

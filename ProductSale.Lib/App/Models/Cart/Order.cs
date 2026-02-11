@@ -23,5 +23,6 @@
     {
         public List<OrderData> InProgress { get; set; } = new List<OrderData>();
         public List<OrderData> Completed { get; set; } = new List<OrderData>();
+        public List<OrderData> Pending { get; set; } = new List<OrderData>();
     }
 }

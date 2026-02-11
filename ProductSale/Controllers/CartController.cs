@@ -13,7 +13,7 @@ namespace ProductSale.Controllers
 {
     [EnableCors("CorsPolicy")]
     [Route("v1/[controller]")]
-    [Authorize(Roles = Role.User)]
+    [Authorize(Roles = Role.User + "," + Role.Admin)]
     [ApiController]
     public class CartController : ControllerBase
     {
@@ -125,6 +125,27 @@ namespace ProductSale.Controllers
             var completed = await _service.GetCartByStatusAsync(CartStatus.Completed, baseUrl);
 
             trackOrder.Completed = completed ?? new List<OrderData>();
+
+            return Ok(JsonResultVm<TrackOrder>.SuccessResponse("Cart fetched successfully.", trackOrder));
+        }
+
+        [HttpPost("OrderStatus")]
+        public async Task<IActionResult> OrderStatus()
+        {
+            _service.UserId = -1;
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+
+            TrackOrder trackOrder = new TrackOrder();
+            var inProgress = await _service.GetCartByStatusAsync(CartStatus.InProgress, baseUrl);
+            trackOrder.InProgress = inProgress ?? new List<OrderData>();
+
+            var completed = await _service.GetCartByStatusAsync(CartStatus.Completed, baseUrl);
+
+            trackOrder.Completed = completed ?? new List<OrderData>();
+
+            var pending = await _service.GetCartByStatusAsync(CartStatus.Pending, baseUrl);
+
+            trackOrder.Pending = pending ?? new List<OrderData>();
 
             return Ok(JsonResultVm<TrackOrder>.SuccessResponse("Cart fetched successfully.", trackOrder));
         }
