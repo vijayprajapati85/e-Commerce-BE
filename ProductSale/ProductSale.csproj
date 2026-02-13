@@ -8,11 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="EmailTemplate\NewProducts.cshtml" />
     <Content Remove="EmailTemplate\Order.cshtml" />
     <Content Remove="EmailTemplate\ResetPassword.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+
+    <None Include="EmailTemplate\NewProducts.cshtml" />
 
     <None Include="EmailTemplate\ResetPassword.cshtml" />
 
@@ -23,6 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />

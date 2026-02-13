@@ -53,7 +53,7 @@ namespace ProductSale.Lib.Infra.Repo
                 return result?.FirstOrDefault();
 
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -64,14 +64,14 @@ namespace ProductSale.Lib.Infra.Repo
             {
                 return await queryFactory.Query(TableName)
                     .Where("emailId", userInfo.EmailId)
-                    .Where("id",userInfo.Id)
+                    .Where("id", userInfo.Id)
                     .UpdateAsync(new
                     {
                         emailsend = userInfo.EmailSend,
                     });
 
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return 0;
             }
@@ -85,12 +85,12 @@ namespace ProductSale.Lib.Infra.Repo
                      .Where("emailId", userInfo.EmailId)
                      .Where("id", userInfo.Id)
                          .UpdateAsync(new
-                        {
+                         {
                              emailsend = userInfo.EmailSend,
                              password = userInfo.Password,
-                        });
+                         });
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return 0;
             }
@@ -113,5 +113,20 @@ namespace ProductSale.Lib.Infra.Repo
                 return null;
             }
         }
+
+        public async Task<List<UserInfo>?> GetAllUsers()
+        {
+            try { 
+                var result = await queryFactory.Query(TableName)
+                    .Where("role", Role.User)
+                    .GetAsync<UserInfo>();
+                
+                return result.ToList(); 
+            }
+            catch (Exception) {
+                return null;
+            }
+        }
+
     }
 }

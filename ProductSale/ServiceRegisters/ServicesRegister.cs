@@ -14,6 +14,8 @@ namespace ProductSale.ServiceRegisters
             services.AddKeyedTransient<IEmailMessageBuilder, SignUpEmailMessageBuilder>(RecipientType.SignUp);
             services.AddKeyedTransient<IEmailMessageBuilder, ResetEmailMessageBuilder>(RecipientType.ForgotPassword);
             services.AddKeyedTransient<IEmailMessageBuilder, OrderEmailMessageBuilder>(RecipientType.Order);
+            services.AddKeyedTransient<IEmailMessageBuilder, CartEmailMessageBuilder>(RecipientType.Cart);
+            services.AddKeyedTransient<IEmailMessageBuilder, NewProductEmailMessageBuilder>(RecipientType.NewProducts);
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IMailService, MailService>();
             services.AddTransient<IProductService, ProductService>();
@@ -22,6 +24,7 @@ namespace ProductSale.ServiceRegisters
             services.AddTransient<IUserInfoService, UserInfoService>();
             services.AddTransient<ICartInfoService, CartInfoService>();
             services.AddTransient<IContactInfoService, ContactInfoService>();
+            services.AddTransient<IJobSchedulerService, JobSchedulerService>();
         }
     }
 }

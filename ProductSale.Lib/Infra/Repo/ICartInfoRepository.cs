@@ -10,5 +10,6 @@ namespace ProductSale.Lib.Infra.Repo
         Task<int> DeleteCartInfoAsync(CartInfo cartInfo);
         Task<(int, long)> CartOrderAsync(long userId);
         Task<List<Order>?> GetOrderByUserIdAsync(long userId, string orderId = "");
+        Task<List<long>> GetUserIdPendingCart();
     }
 }

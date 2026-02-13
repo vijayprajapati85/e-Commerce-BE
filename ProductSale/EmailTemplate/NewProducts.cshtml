@@ -3,43 +3,34 @@
 }
 <p style="line-height: 15.0pt; padding: 8px 0px; margin: 0px;">
     <span style="font-size: 10.5pt;">
-        <b>Dear @Model.RecipientName,</b>
+        <b>Dear User,</b>
     </span>
 </p>
 <p style="line-height: 15.0pt; padding: 8px 0px; margin: 0px;">
-    @if (Model.Order != null && Model.Order.Count > 0)
+
+    <span style="font-size: 10.5pt;">
+        Below are the new products introduce.
+    </span>
+</p>
+<p style="line-height: 15.0pt; padding: 8px 0px; margin: 0px;">
+    @if (Model.Products != null && Model.Products.Count > 0)
     {
         <table style="width:100%; border-collapse: collapse; border: 1px solid #cccccc;">
             <thead>
                 <tr>
                     <td style="border: 1px solid #cccccc; padding: 8px; text-align: left;">Product Name</td>
                     <td style="border: 1px solid #cccccc; padding: 8px; text-align: left;">Price(£)</td>
-                    <td style="border: 1px solid #cccccc; padding: 8px; text-align: left;">Quantity</td>
-                    <td style="border: 1px solid #cccccc; padding: 8px; text-align: left;">Total</td>
                 </tr>
             </thead>
             <tbody>
-                @{
-                    decimal finalTotal = 0;
-                }
-                @foreach (var item in Model.Order)
+                @foreach (var item in Model.Products)
                 {
-                    decimal total = item.Price * item.Quantity;
-                    finalTotal += total;
                     <tr>
                         <td style="border: 1px solid #cccccc; padding: 8px;">@item.Name</td>
                         <td style="border: 1px solid #cccccc; padding: 8px;">@item.Price.ToString("C", new System.Globalization.CultureInfo("en-GB"))</td>
-                        <td style="border: 1px solid #cccccc; padding: 8px;">@item.Quantity</td>
-                        <td style="border: 1px solid #cccccc; padding: 8px;">@total.ToString("C", new System.Globalization.CultureInfo("en-GB"))</td>
                     </tr>
                 }
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3">Grand Total</td>
-                    <td>@finalTotal.ToString("C", new System.Globalization.CultureInfo("en-GB"))</td>
-                </tr>
-            </tfoot>
         </table>
     }
 
