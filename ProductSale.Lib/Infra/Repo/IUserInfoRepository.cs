@@ -9,5 +9,6 @@ namespace ProductSale.Lib.Infra.Repo
         Task<int> UpdateEmailSendStatus(UserInfo userInfo);
         Task<int> UpdatePassword(UserInfo userInfo);
         Task<UserInfo?> GetUserById(long id);
+        Task<List<UserInfo>?> GetAllUsers();
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models.Cart;
+using SqlKata;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 
@@ -153,7 +154,7 @@ namespace ProductSale.Lib.Infra.Repo
                     return (List<Order>)await queryFactory.Query(ProductInfo)
                         .LeftJoin(TableName, "CartInfo.ProductId", "ProductInfo.Id")
                         .Where("CartInfo.UserId", userId)
-                        .Where("CartInfo.Status", CartStatus.InProgress)
+                        .Where("CartInfo.Status", CartStatus.Pending)
                         .Select("ProductInfo.Name as Name", "ProductInfo.Price as Price", "CartInfo.Quantity as Quantity", "CartInfo.OrderId as OrderId")
                         .GetAsync<Order>();
                 }
@@ -223,5 +224,25 @@ namespace ProductSale.Lib.Infra.Repo
                 return null;
             }
         }
+
+        public async Task<List<long>> GetUserIdPendingCart()
+        {
+            _logger.LogInformation("Inside GetUserIdPendingCart ===");
+            try
+            {
+                var query = await queryFactory.Query("CartInfo")
+                            .Select("UserId")
+                            .Distinct()
+                            .Where("Status", "Pending")
+                            .GetAsync<long>();
+
+                return query.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in GetUserIdPendingCart: {Message}", ex.Message);
+                return new List<long>();
+            }
+}
     }
 }

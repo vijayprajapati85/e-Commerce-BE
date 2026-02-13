@@ -8,6 +8,7 @@
         public const string ForgotPassword = "ForgotPassword";
         public const string Order = "Order";
         public const string OrderTeam = "OrderTeam";
-
+        public const string Cart = "Cart";
+        public const string NewProducts = "NewProducts";
     }
 }

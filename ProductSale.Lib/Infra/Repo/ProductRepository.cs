@@ -179,5 +179,28 @@ namespace ProductSale.Lib.Infra.Repo
                 return null;
             }
         }
+
+        public async Task<List<ProductInfoDto>?> GetNewProduct()
+        {
+            _logger.LogInformation("Inside GetNewProduct ===");
+            try
+            {
+                var query = queryFactory.Query(TableName)
+                            .Join(CatTable, $"{CatTable}.Id", $"{TableName}.CatId")
+                    .Join(SubCatTable, $"{SubCatTable}.Id", $"{TableName}.SubCatId")
+                    .Where($"{TableName}.IsActive", true)
+                    .WhereRaw($"CAST({TableName}.[CreatedDateTime] AS DATE) = CAST(GETDATE() AS DATE)");
+
+                var result = await query.Select($"{TableName}.*", $"{CatTable}.Name as CatName", $"{SubCatTable}.Name as SubCatName")
+                        .GetAsync<ProductInfoDto>();
+
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside GetNewProduct === {error}", ex);
+                return null;
+            }
+        }
     }
 }

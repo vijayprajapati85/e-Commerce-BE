@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using ProductSale.Lib.App.Models;
 using System.Text;
 using FluentEmail.MailKitSmtp;
+using Hangfire;
+using ProductSale.Lib.App.Services;
 
 namespace ProductSale
 {
@@ -54,6 +56,16 @@ namespace ProductSale
                 .AddMailKitSender(smtpOption);
 
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+
+            var connectionString = Configuration["HangfireConnection"];
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(connectionString));
+            services.AddHangfireServer();
+
             services.AddRegisters(Configuration, typeof(Startup).Assembly);
         }
 
@@ -88,8 +100,18 @@ namespace ProductSale
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseHangfireDashboard();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 
+            RecurringJob.AddOrUpdate<IJobSchedulerService>("CartReminder", 
+                service => service.CartReminderJob(), 
+                Cron.Daily(23, 55),
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+
+            RecurringJob.AddOrUpdate<IJobSchedulerService>("NewProductsReminder",
+                service => service.NewProductReminderJob(),
+                Cron.Daily(23, 30),
+                new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
         }
     }
 }

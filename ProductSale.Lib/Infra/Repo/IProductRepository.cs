@@ -11,6 +11,7 @@ namespace ProductSale.Lib.Infra.Repo
         Task<int> DeleteProductAsync(long id);
         Task<string> GetImageNameByIdAsync(long id);
         Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product);
+        Task<List<ProductInfoDto>?> GetNewProduct();
 
     }
 }
