@@ -10,5 +10,6 @@ namespace ProductSale.Lib.Infra.Repo
         Task<int> UpdatePassword(UserInfo userInfo);
         Task<UserInfo?> GetUserById(long id);
         Task<List<UserInfo>?> GetAllUsers();
+        Task<int> UpdateProfile(Profile profile);
     }
 }
