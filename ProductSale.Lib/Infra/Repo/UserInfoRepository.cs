@@ -128,5 +128,23 @@ namespace ProductSale.Lib.Infra.Repo
             }
         }
 
+        public async Task<int> UpdateProfile(Profile profile)
+        {
+            try
+            {
+                return await queryFactory.Query(TableName)
+                     .Where("id", profile.Id)
+                    .UpdateAsync(new
+                    {
+                        fullname = profile.FullName,
+                        address = profile.Address,
+                        mobileno = profile.MobileNo,
+                    });
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
     }
 }

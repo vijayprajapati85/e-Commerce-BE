@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using ProductSale.Lib.App.Constants;
 using ProductSale.Lib.App.Models;
 using ProductSale.Lib.App.Models.Email;
 using ProductSale.Lib.App.Services;
 using ProductSale.Lib.Infra.WebApi;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ProductSale.Controllers
 {
@@ -89,6 +93,34 @@ namespace ProductSale.Controllers
             catch (Exception ex)
             {
                 return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, userSignin.EmailId));
+            }
+        }
+
+        [Authorize]
+        [HttpPost("Profile")]
+        public async Task<IActionResult> Profile([FromBody] Profile profile)
+        {
+            try
+            {
+                string authorizationHeader = Request.Headers[HeaderNames.Authorization].ToString();
+                var handler = new JwtSecurityTokenHandler();
+
+                if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+                {
+                    string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                    var jsonToken = handler.ReadJwtToken(token);
+                    var userIdClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid);
+                    profile.Id = Convert.ToInt64(userIdClaim?.Value);
+
+                    var result = await _service.UpdateProfile(profile);
+
+                    return Ok(JsonResultVm<int>.SuccessResponse("Profile update success.", result));
+                }
+                return BadRequest((JsonResultVm<string>.FailResponse("User not valid", profile.FullName)));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(JsonResultVm<string>.FailResponse(ex.Message, profile.FullName));
             }
         }
 
