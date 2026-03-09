@@ -214,6 +214,56 @@ namespace ProductSale.Lib.App.Services
                 return 0;
             }
         }
-       
+
+        public async Task<List<ProductInfoDto>?> SearchProducts(ProductFilterDto product, string folderPath, bool isPriceRequired)
+        {
+            try
+            {
+                _logger.LogInformation("Inside SearchProducts ===");
+                if(string.IsNullOrEmpty(product.Name))
+                    return null;
+
+                var cacheKey = CacheKey.ProductNameKey(product.Name);
+
+                if (_cache.TryGetValue(cacheKey, out List<ProductInfoDto>? cachedProducts))
+                {
+                    var priceProduct = cachedProducts.DeepCopyData();
+                    if (!isPriceRequired)
+                    {
+                        priceProduct?.ForEach(item => { item.Price = 0; });
+                    }
+                    return priceProduct;
+                }
+
+                var result = await _repository.SearchProducts(product);
+
+                if (result != null)
+                {
+                    result.ForEach(result =>
+                    {
+                        if (!string.IsNullOrEmpty(result.ImageName))
+                        {
+                            result.ImageName = folderPath + $"{result.ImageName}";
+                        }
+                    });
+                }
+                
+                _cache.Set(CacheKey.ProductNameKey(product.Name), result);
+
+                var priceData = result.DeepCopyData();
+                if (!isPriceRequired)
+                {
+                    priceData?.ForEach(item => { item.Price = 0; });
+                }
+                return priceData;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside SearchProducts === {error}", ex);
+                return null;
+            }
+        }
+
     }
 }

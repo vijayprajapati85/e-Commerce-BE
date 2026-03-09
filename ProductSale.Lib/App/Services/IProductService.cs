@@ -10,6 +10,7 @@ namespace ProductSale.Lib.App.Services
         Task<List<ProductInfoDto>?> GetAllProductsAsync(string folderPath);
         Task<int> DeleteProductAsync(long id);
         Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product, string folderPath, bool isPriceRequired = false);
+        Task<List<ProductInfoDto>?> SearchProducts(ProductFilterDto product, string folderPath, bool isPriceRequired = false);
 
     }
 }

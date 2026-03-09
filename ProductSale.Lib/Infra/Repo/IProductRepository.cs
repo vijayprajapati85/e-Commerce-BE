@@ -12,6 +12,7 @@ namespace ProductSale.Lib.Infra.Repo
         Task<string> GetImageNameByIdAsync(long id);
         Task<List<ProductInfoDto>?> GetProductByCatSubCat(ProductFilterDto product);
         Task<List<ProductInfoDto>?> GetNewProduct();
+        Task<List<ProductInfoDto>?> SearchProducts(ProductFilterDto product);
 
     }
 }

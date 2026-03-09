@@ -11,5 +11,6 @@ namespace ProductSale.Lib.App.Services
         Task<UserProfile> UserSigin(UserSignin userSignin, string folderPath);
         Task<UserProfile> AdminSignin(UserSignin userSignin);
         Task<int> ForgotPassword(string emailId);
+        Task<int> UpdateProfile(Profile profile);
     }
 }

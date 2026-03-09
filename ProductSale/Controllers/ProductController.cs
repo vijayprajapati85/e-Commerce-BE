@@ -99,5 +99,32 @@ namespace ProductSale.Controllers
 
             return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
         }
+
+        [HttpPost("SearchProducts")]
+        public async Task<IActionResult> SearchProducts([FromBody] ProductFilterDto product)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+            var result = await _service.SearchProducts(product, baseUrl);
+            if (result == null || result.Count == 0)
+            {
+                return Ok(JsonResultVm<ProductInfoDto>.FailResponse("No Records", "Record not found", null));
+            }
+
+            return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
+        }
+
+        [Authorize(Roles = Role.User)]
+        [HttpPost("SearchProductsWithPrice")]
+        public async Task<IActionResult> SearchProductsWithPrice([FromBody] ProductFilterDto product)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/Product/";
+            var result = await _service.SearchProducts(product, baseUrl, true);
+            if (result == null || result.Count == 0)
+            {
+                return Ok(JsonResultVm<ProductInfoDto>.FailResponse("No Records", "Record not found", null));
+            }
+
+            return Ok(JsonResultVm<List<ProductInfoDto>>.SuccessResponse("Record found", result, result.Count));
+        }
     }
 }
