@@ -162,6 +162,8 @@ namespace ProductSale.Lib.App.Services
                     {
                         FullName = user.FullName,
                         EmailId = user.EmailId,
+                        Address = user.Address,
+                        MobileNo = user.MobileNo,
                         Token = token,
                         OrderData = orders
                     };
@@ -195,6 +197,18 @@ namespace ProductSale.Lib.App.Services
                 throw new BusinessRuleException("Login Credential not match");
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateProfile(Profile profile)
+        {
+            try
+            {
+               return await _repository.UpdateProfile(profile);
+            }
+            catch(Exception)
             {
                 throw;
             }

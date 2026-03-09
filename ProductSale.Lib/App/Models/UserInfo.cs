@@ -7,6 +7,8 @@
         public string EmailId { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string MobileNo { get; set; } = string.Empty;
         public bool EmailSend { get; set; } = false;
         public DateTimeOffset CreatedDateTime { get; set; }
         public DateTimeOffset UpdatedDateTime { get; set; }

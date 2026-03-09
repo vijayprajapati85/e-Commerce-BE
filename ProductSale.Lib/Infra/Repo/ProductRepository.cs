@@ -202,5 +202,32 @@ namespace ProductSale.Lib.Infra.Repo
                 return null;
             }
         }
+
+        public async Task<List<ProductInfoDto>?> SearchProducts(ProductFilterDto product)
+        {
+            _logger.LogInformation("Inside SearchProducts ===");
+            try
+            {
+                var query = queryFactory.Query(TableName)
+                            .Join(CatTable, $"{CatTable}.Id", $"{TableName}.CatId")
+                            .Join(SubCatTable, $"{SubCatTable}.Id", $"{TableName}.SubCatId")
+                            .Where($"{TableName}.IsActive", 1)
+                            .Where($"{CatTable}.IsActive", 1)
+                            .Where($"{SubCatTable}.IsActive", 1)
+                            .WhereLike($"{TableName}.Name", $"%{product.Name}%");
+                
+
+                
+                var result = await query.Select($"{TableName}.*", $"{CatTable}.Name as CatName", $"{SubCatTable}.Name as SubCatName")
+                        .GetAsync<ProductInfoDto>();
+
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Inside SearchProducts === {error}", ex);
+                return null;
+            }
+        }
     }
 }

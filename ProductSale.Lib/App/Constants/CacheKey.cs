@@ -30,6 +30,10 @@ namespace ProductSale.Lib.App.Constants
         {
             return $"{Product}{id}";
         }
+        public static string ProductNameKey(string productName)
+        {
+            return $"{Product}{productName}";
+        }
 
         public const string ProductByCatSubCat = $"ProductByCatSubCat";
         public static string ProductByCatSubCatKey(long? catId, long? subId)
